@@ -390,8 +390,8 @@ CONTAINS
 
 
         ! subtract the dipole
-        bxj = bx! - bxd   no dipole case
-        bzj = bz! - bzd
+        bxj = bx - bxd  ! no dipole case
+        bzj = bz - bzd
 
     return
     end subroutine read_data
@@ -465,8 +465,8 @@ real(rprec) :: fyb(zahlx,zahlz) ! scratch grid variable
 
 !    bxj = bxj*pr2;  bzj = bzj*pr2
      
-    bx = bxj !+ bxd ! no dipole
-    bz = bzj !+ bzd
+    bx = bxj + bxd ! no dipole
+    bz = bzj + bzd
 !   write(*,*) 'pushB',maxval(bz)
 end subroutine push_B
 

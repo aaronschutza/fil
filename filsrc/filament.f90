@@ -171,17 +171,17 @@ end if
 
 !**********************************************
 if (do_sweep) then
-	n_pnt = sw_points
-	allocate(thr_val(n_pnt))
-	read(sw_min,*) minval
-	read(sw_max,*) maxval
-	if (n_pnt > 1) then
-		do i = 1,n_pnt
-			thr_val(i) = minval+(maxval-minval)*((i-1.0)/(n_pnt-1.0))
-		enddo
-	endif
+       n_pnt = sw_points
+       allocate(thr_val(n_pnt))
+       read(sw_min,*) minval
+       read(sw_max,*) maxval
+       if (n_pnt > 1) then
+              do i = 1,n_pnt
+                     thr_val(i) = minval+(maxval-minval)*((i-1.0)/(n_pnt-1.0))
+              enddo
+       endif
 else
-	n_pnt = 1
+       n_pnt = 1
 endif
 !**********************************************
 
@@ -189,7 +189,7 @@ endif
 
 
 if (mod(dimj,2)<1) then
-	dimj = dimj+1
+       dimj = dimj+1
 endif
 !**********************************************
 allocate(state(dimi,dimj))
@@ -209,11 +209,11 @@ id = 0
 
 
 !$ if (do_parallel) then
-!$ 	if (threads_to_use>0) then
-!$	  call omp_set_num_threads(threads_to_use)
+!$        if (threads_to_use>0) then
+!$         call omp_set_num_threads(threads_to_use)
 !$  endif
 !$ else
-!$	call omp_set_num_threads(1)
+!$       call omp_set_num_threads(1)
 !$ endif
 
 
@@ -231,23 +231,23 @@ id = 0
 !$OMP master
 allocate(thr_domain(nthreads,2))
 do i = 1,nthreads
-	if ( i == 1 ) then
-		i_thr = 1
-		thr_domain(i,1) = i_thr
-		i_thr = i_thr+dimj/nthreads-1
-		if (mod(dimj,nthreads) /= 0) i_thr = i_thr+1
-		thr_domain(i,2) = i_thr
-	elseif ( i<=mod(dimj,nthreads) ) then
-		i_thr = i_thr+1
-		thr_domain(i,1) = i_thr
-		i_thr = i_thr+dimj/nthreads
-		thr_domain(i,2) = i_thr
-	else
-		i_thr = i_thr+1
-		thr_domain(i,1) = i_thr
-		i_thr = i_thr+dimj/nthreads-1
-		thr_domain(i,2) = i_thr
-	endif
+       if ( i == 1 ) then
+              i_thr = 1
+              thr_domain(i,1) = i_thr
+              i_thr = i_thr+dimj/nthreads-1
+              if (mod(dimj,nthreads) /= 0) i_thr = i_thr+1
+              thr_domain(i,2) = i_thr
+       elseif ( i<=mod(dimj,nthreads) ) then
+              i_thr = i_thr+1
+              thr_domain(i,1) = i_thr
+              i_thr = i_thr+dimj/nthreads
+              thr_domain(i,2) = i_thr
+       else
+              i_thr = i_thr+1
+              thr_domain(i,1) = i_thr
+              i_thr = i_thr+dimj/nthreads-1
+              thr_domain(i,2) = i_thr
+       endif
 enddo
 
 call system('mkdir -p ' // adjustl(trim(fricDir)))
@@ -261,288 +261,284 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 
 
 !$OMP master
-	if(do_sweep .and. n_pnt>1)then
-		write(name,*) thr_val(i_thr)
-		name = adjustl(trim(sw_var)//'='//trim(adjustl(name)))
-		write(*,*) name
-		call readcmdinput(name,str_len_mid)
-		write (name,'(I3.3)') i_thr
-		call system('mkdir -p ' // adjustl(trim(fileDir)))
-		datapath = trim(fileDir)//'/'//trim(fileName)//'.'//trim(name)
-		write(*,*) 'writing data to:'
-		write(*,*) datapath
-	else
-		call system('mkdir -p ' // adjustl(trim(fileDir)))
-		datapath = trim(fileDir)//'/'//trim(fileName)
-		write(*,*) 'writing data to:'
-		write(*,*) datapath
-	endif
+       if(do_sweep .and. n_pnt>1)then
+              write(name,*) thr_val(i_thr)
+              name = adjustl(trim(sw_var)//'='//trim(adjustl(name)))
+              write(*,*) name
+              call readcmdinput(name,str_len_mid)
+              write (name,'(I3.3)') i_thr
+              call system('mkdir -p ' // adjustl(trim(fileDir)))
+              datapath = trim(fileDir)//'/'//trim(fileName)//'.'//trim(name)
+              write(*,*) 'writing data to:'
+              write(*,*) datapath
+       else
+              call system('mkdir -p ' // adjustl(trim(fileDir)))
+              datapath = trim(fileDir)//'/'//trim(fileName)
+              write(*,*) 'writing data to:'
+              write(*,*) datapath
+       endif
 
-	!**********************************************
-	localN = 0
-	localTime = 0.0
-	!**********************************************
-	recallPos = -1
-	time = 0.0
-	n = 0
-	if (cnfIn == 1) then
-		call initialConditions1
-	else
-		write(6,*) 'Error: invalid cnfIn'
-		stop
-	end if
-	!**********************************************
-	if (write_binary_data) then
-		open(unit=111, file=trim(datapath)//".bin",form="unformatted", status="replace",access="stream")
-		close(111)
-		open(unit=111, file=trim(datapath)//".bin",form="unformatted",position="append", status="old",access="stream")
-		write(111) dimi
-		write(111) dimj
-		write(111) dimjp
-		write(111) time
-		write(111) n
-		write(111) state
-		if (dimjp /= 0) then
-			write(111) statePlas
-		end if
-		close(111)
-	endif
+       !**********************************************
+       localN = 0
+       localTime = 0.0
+       !**********************************************
+       recallPos = -1
+       time = 0.0
+       n = 0
+       if (cnfIn == 1) then
+              call initialConditions1
+       else
+              write(6,*) 'Error: invalid cnfIn'
+              stop
+       end if
+       !**********************************************
+       if (write_binary_data) then
+              open(unit=111, file=trim(datapath)//".bin",form="unformatted", status="replace",access="stream")
+              close(111)
+              open(unit=111, file=trim(datapath)//".bin",form="unformatted",position="append", status="old",access="stream")
+              write(111) dimi
+              write(111) dimj
+              write(111) dimjp
+              write(111) time
+              write(111) n
+              write(111) state
+              if (dimjp /= 0) then
+                     write(111) statePlas
+              end if
+              close(111)
+       endif
 
-	if(write_full_filament) then
-		open(unit=111, file=trim(datapath), status="replace")
-		close(111)
-		open(unit=111, file=trim(datapath),position="append", status="old")
-		write(111,*) dimi
-		write(111,*) dimj + dimjp
-		write(111,*) time
-		write(111,*) n
-		do i = 1,dimj
-			write(111,*) state(:,i)
-		end do
-		if (dimjp /= 0) then
-			do i = 1,dimjp
-				write(111,*) statePlas(:,i)
-			end do
-		end if
-		close(111)
-	endif
+       if(write_full_filament) then
+              open(unit=111, file=trim(datapath), status="replace")
+              close(111)
+              open(unit=111, file=trim(datapath),position="append", status="old")
+              write(111,*) dimi
+              write(111,*) dimj + dimjp
+              write(111,*) time
+              write(111,*) n
+              do i = 1,dimj
+                     write(111,*) state(:,i)
+              end do
+              if (dimjp /= 0) then
+                     do i = 1,dimjp
+                            write(111,*) statePlas(:,i)
+                     end do
+              end if
+              close(111)
+       endif
 
-	if (write_midpoint) then
-		open(unit=111, file=trim(datapath)//'.mid', status="replace")
-		close(111)
-		open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
-		write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1), &
-		& state(d,dimj/2+1),state(p,dimj/2+1),state(b,dimj/2+1),filK(state)
-		close(111)
-	endif
+       if (write_midpoint) then
+              open(unit=111, file=trim(datapath)//'.mid', status="replace")
+              close(111)
+              open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
+              write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1), &
+              & state(d,dimj/2+1),state(p,dimj/2+1),state(b,dimj/2+1),filK(state)
+              close(111)
+       endif
 
-	if (write_boundary) then
-		open(unit=111, file=trim(datapath)//'.bnd', status="replace")
-		close(111)
-		open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
-		write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
-		close(111)
-	endif
+       if (write_boundary) then
+              open(unit=111, file=trim(datapath)//'.bnd', status="replace")
+              close(111)
+              open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
+              write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
+              close(111)
+       endif
 
-	if (plotL) then
-		notMax = n <= m
-	else
-		notMax = time < tMax
-	end if
+       if (plotL) then
+              notMax = n <= m
+       else
+              notMax = time < tMax
+       end if
 !$OMP end master
 
 !$OMP barrier
 
  do while (notMax)
 
-	!$OMP master
-		if (mod(n,nOutInterv) == 0) then
-			write(6,*) 'n =', n,'t =',time,'tau =',tau
-			write(6,*) 'xe=',state(x,dimj/2+1),'KE=',fil_KinNRG(state)
-			!call testState
-		end if
-		if (tau < tau_min_limit) then
-			write(*,*) 'time step too small'
-			stop
-		end if
-	!$OMP end master
+       !$OMP master
+              if (mod(n,nOutInterv) == 0) then
+                     write(6,*) 'n =', n,'t =',time,'tau =',tau
+                     write(6,*) 'xe=',state(x,dimj/2+1),'KE=',fil_KinNRG(state)
+                     !call testState
+              end if
+              if (tau < tau_min_limit) then
+                     write(*,*) 'time step too small'
+                     stop
+              end if
+       !$OMP end master
 
-	!$OMP barrier
-	select case(method)
-	case(1)
-		!method = euler
-		if (adaptL) then 
-			call adaptive(euler,derivs1,algebra1,eulerp,derivs1p,algebra1p,id)
-		else
-			call fixedtau(euler,derivs1,algebra1,eulerp,derivs1p,algebra1p,id)
-		end if
-	case(2)
-		!methodP = backEuler
-		if (adaptL) then 
-			call adaptive(backEuler,derivs1,algebra1,backEulerp,derivs1p,algebra1p,id)
-		else
-			call fixedtau(backEuler,derivs1,algebra1,backEulerp,derivs1p,algebra1p,id)
-		end if
-	case(3)
-		!methodP = trapezoidal
-		if (adaptL) then 
-			call adaptive(trapezoidal,derivs1,algebra1,trapezoidalp,derivs1p,algebra1p,id)
-		else
-			call fixedtau(trapezoidal,derivs1,algebra1,trapezoidalp,derivs1p,algebra1p,id)
-		end if
-	case(4)
-		!methodP = rk2
-		if (adaptL) then 
-			call adaptive(rk2,derivs1,algebra1,rk2p,derivs1p,algebra1p,id)
-		else
-			call fixedtau(rk2,derivs1,algebra1,rk2p,derivs1p,algebra1p,id)
-		end if
-	case(5)
-		!methodP = rk4
-		if (adaptL) then 
-			call adaptive(rk4,derivs1,algebra1,rk4p,derivs1p,algebra1p,id)
-		else
-			call fixedtau(rk4,derivs1,algebra1,rk4p,derivs1p,algebra1p,id)
-		end if
-	case default
-		write(6,*) 'Error: invalid method'
-		stop
-	end select
-	!$OMP barrier
-	
-	!$OMP master
-		oldState = state
-		state = newState
-		if(dimjp/=0)then
-			oldStatePlas = statePlas
-			statePlas = newStatePlas
-		endif
-		!if (.not. errorFlag2) then
-			!call reconnect2
-		!end if
-		localTime = localTime + tau
-		localN = localN + 1
-		time = time + tau
-		n = n + 1
-		!alpha = alphaT(time)
-		if(bbfrun)then
-			if (state(vx,dimj/2+1)<0.0 .or. abs(state(x,dimj/2+1))<boundary .and. time>tInterv) then
-				notMax = .false. !exit when tailward motion starts
-				localTime = tInterv+1.0 !write last data
-			endif
-		endif
+       !$OMP barrier
+       select case(method)
+       case(1)
+              !method = euler
+              if (adaptL) then 
+                     call adaptive(euler,derivs1,algebra1,eulerp,derivs1p,algebra1p,id)
+              else
+                     call fixedtau(euler,derivs1,algebra1,eulerp,derivs1p,algebra1p,id)
+              end if
+       case(2)
+              !methodP = backEuler
+              if (adaptL) then 
+                     call adaptive(backEuler,derivs1,algebra1,backEulerp,derivs1p,algebra1p,id)
+              else
+                     call fixedtau(backEuler,derivs1,algebra1,backEulerp,derivs1p,algebra1p,id)
+              end if
+       case(3)
+              !methodP = trapezoidal
+              if (adaptL) then 
+                     call adaptive(trapezoidal,derivs1,algebra1,trapezoidalp,derivs1p,algebra1p,id)
+              else
+                     call fixedtau(trapezoidal,derivs1,algebra1,trapezoidalp,derivs1p,algebra1p,id)
+              end if
+       case(4)
+              !methodP = rk2
+              if (adaptL) then 
+                     call adaptive(rk2,derivs1,algebra1,rk2p,derivs1p,algebra1p,id)
+              else
+                     call fixedtau(rk2,derivs1,algebra1,rk2p,derivs1p,algebra1p,id)
+              end if
+       case(5)
+              !methodP = rk4
+              if (adaptL) then 
+                     call adaptive(rk4,derivs1,algebra1,rk4p,derivs1p,algebra1p,id)
+              else
+                     call fixedtau(rk4,derivs1,algebra1,rk4p,derivs1p,algebra1p,id)
+              end if
+       case default
+              write(6,*) 'Error: invalid method'
+              stop
+       end select
+       !$OMP barrier
+       
+       !$OMP master
+              oldState = state
+              state = newState
+              if(dimjp/=0)then
+                     oldStatePlas = statePlas
+                     statePlas = newStatePlas
+              endif
+              !if (.not. errorFlag2) then
+                     !call reconnect2
+              !end if
+              localTime = localTime + tau
+              localN = localN + 1
+              time = time + tau
+              n = n + 1
+              !alpha = alphaT(time)
+              if(bbfrun)then
+                     if (state(vx,dimj/2+1)<0.0 .or. abs(state(x,dimj/2+1))<boundary .and. time>tInterv) then
+                            notMax = .false. !exit when tailward motion starts
+                            localTime = tInterv+1.0 !write last data
+                     endif
+              endif
 
-		if (plotL) then
-			if (localN >= nInterv) then
-				localN = 0
-				if (write_binary_data) then
-					open(unit=111, file=trim(datapath)//".bin",form="unformatted",position="append", status="old")
-					write(111,*) dimi
-					write(111,*) dimj
-					write(111,*) dimjp
-					write(111,*) time
-					write(111,*) n
-					write(111,*) state
-					if (dimjp /= 0) then
-						write(111,*) statePlas
-					end if
-					close(111)
-				endif
+              if (plotL) then
+                     if (localN >= nInterv) then
+                            localN = 0
+                            if (write_binary_data) then
+                                   open(unit=111, file=trim(datapath)//".bin",form="unformatted",position="append", status="old")
+                                   write(111,*) dimi
+                                   write(111,*) dimj
+                                   write(111,*) dimjp
+                                   write(111,*) time
+                                   write(111,*) n
+                                   write(111,*) state
+                                   if (dimjp /= 0) then
+                                          write(111,*) statePlas
+                                   end if
+                                   close(111)
+                            endif
 
-				if(write_full_filament) then
-					open(unit=111, file=trim(datapath),position="append", status="old")
-					write(111,*) dimi
-					write(111,*) dimj + dimjp
-					write(111,*) time
-					write(111,*) n
-					do i = 1,dimj
-						write(111,*) state(:,i)
-					end do
-					if (dimjp /= 0) then
-						do i = 1,dimjp
-							write(111,*) statePlas(:,i)
-						end do
-					end if
-					close(111)
-				endif
+                            if(write_full_filament) then
+                                   open(unit=111, file=trim(datapath),position="append", status="old")
+                                   write(111,*) dimi
+                                   write(111,*) dimj + dimjp
+                                   write(111,*) time
+                                   write(111,*) n
+                                   do i = 1,dimj
+                                          write(111,*) state(:,i)
+                                   end do
+                                   if (dimjp /= 0) then
+                                          do i = 1,dimjp
+                                                 write(111,*) statePlas(:,i)
+                                          end do
+                                   end if
+                                   close(111)
+                            endif
 
-				if (write_midpoint) then
-					open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
-					write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1)
-					close(111)
-				endif
+                            if (write_midpoint) then
+                                   open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
+                                   write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1)
+                                   close(111)
+                            endif
 
-				if (write_boundary) then
-					open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
-					write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
-					close(111)
-				endif
-			end if
-		else
-			if (localTime > tInterv) then
-				localTime = 0.0
-				if (write_binary_data) then
-					open(unit=111, file=trim(datapath)//".bin",form="unformatted",position="append", status="old",access="stream")
-					write(111) dimi
-					write(111) dimj
-					write(111) dimjp
-					write(111) time
-					write(111) n
-					write(111) state
-					if (dimjp /= 0) then
-						write(111) statePlas
-					end if
-					close(111)
-				endif
+                            if (write_boundary) then
+                                   open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
+                                   write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
+                                   close(111)
+                            endif
+                     end if
+              else
+                     if (localTime > tInterv) then
+                            localTime = 0.0
+                            if (write_binary_data) then
+                                   open(unit=111, file=trim(datapath)//".bin",form="unformatted",&
+                                           position="append", status="old",access="stream")
+                                   write(111) dimi
+                                   write(111) dimj
+                                   write(111) dimjp
+                                   write(111) time
+                                   write(111) n
+                                   write(111) state
+                                   if (dimjp /= 0) then
+                                          write(111) statePlas
+                                   end if
+                                   close(111)
+                            endif
 
-				if(write_full_filament) then
-					open(unit=111, file=trim(datapath),position="append", status="old")
-					write(111,*) dimi
-					write(111,*) dimj + dimjp
-					write(111,*) time
-					write(111,*) n
-					do i = 1,dimj
-						write(111,*) state(:,i)
-					end do
-					if (dimjp /= 0) then
-						do i = 1,dimjp
-							write(111,*) statePlas(:,i)
-						end do
-					end if
-					close(111)
-				endif
+                            if(write_full_filament) then
+                                   open(unit=111, file=trim(datapath),position="append", status="old")
+                                   write(111,*) dimi
+                                   write(111,*) dimj + dimjp
+                                   write(111,*) time
+                                   write(111,*) n
+                                   do i = 1,dimj
+                                          write(111,*) state(:,i)
+                                   end do
+                                   if (dimjp /= 0) then
+                                          do i = 1,dimjp
+                                                 write(111,*) statePlas(:,i)
+                                          end do
+                                   end if
+                                   close(111)
+                            endif
 
-				if (write_midpoint) then
-					open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
-					write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1), &
-						& state(d,dimj/2+1),state(p,dimj/2+1),state(b,dimj/2+1),filK(state)
-					close(111)
-				endif
+                            if (write_midpoint) then
+                                   open(unit=111, file=trim(datapath)//'.mid',position="append", status="old")
+                                   write(111,*) time,state(x,dimj/2+1),state(z,dimj/2+1),state(vx,dimj/2+1),state(vz,dimj/2+1), &
+                                          & state(d,dimj/2+1),state(p,dimj/2+1),state(b,dimj/2+1),filK(state)
+                                   close(111)
+                            endif
 
-				if (write_boundary) then
-					open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
-					write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
-					close(111)
-				endif
-			end if
-		end if
-		
-		if (plotL .and. notMax) then
-			notMax = n <= m
-		endif
-		if (.not. plotL .and. notMax) then
-			notMax = time < tMax
-		endif
-	!$OMP end master
+                            if (write_boundary) then
+                                   open(unit=111, file=trim(datapath)//'.bnd',position="append", status="old")
+                                   write(111,*) time,state(x,1),state(z,1),state(x,dimj),state(z,dimj)
+                                   close(111)
+                            endif
+                     end if
+              end if
+              
+              if (plotL .and. notMax) then
+                     notMax = n <= m
+              endif
+              if (.not. plotL .and. notMax) then
+                     notMax = time < tMax
+              endif
+       !$OMP end master
 
-	!$OMP barrier
-	
+       !$OMP barrier
+       
  end do
- !$OMP master
- 	if(save_external_file)then
- 		call saveFilament
- 	endif
- !$OMP end master
 enddo!*********end thr_val sequence ****
 !$OMP end parallel
 run = 0

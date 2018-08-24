@@ -21,7 +21,7 @@ FRC_MOD_FILES := $(wildcard $(FRC_DIR)/*.mod.f90)
 OBJ_FRC_MOD_FILES := $(addprefix $(OBJ_DIR)/,$(notdir $(FRC_MOD_FILES:.f90=.o)))
 CC := gfortran
 LD_FLAGS := -I$(MOD_DIR) -J$(MOD_DIR)
-CC_FLAGS := -I$(MOD_DIR) -J$(MOD_DIR) -fdefault-real-8
+CC_FLAGS := -I$(MOD_DIR) -J$(MOD_DIR) -fdefault-real-8 
 TS_FLAGS :=
 FR_FLAGS := -I$(MOD_DIR) -J$(MOD_DIR)
 OP_FLAG := -O2

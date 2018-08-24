@@ -123,16 +123,6 @@ case('b_write_boundary=','write_boundary=')
 call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
 read(name(istr+1:str_len_max),*) write_boundary
 exit
-!**logical**
-case('b_use_external_file=','use_external_file=')
-call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
-read(name(istr+1:str_len_max),*) use_external_file
-exit
-!**logical**
-case('b_save_external_file=','save_external_file=')
-call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
-read(name(istr+1:str_len_max),*) save_external_file
-exit
 !**integer**
 case('i_method=','method=')
 read(name(istr+1:str_len_max),*) method
