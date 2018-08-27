@@ -56,6 +56,10 @@ module initCond
        logical :: trace_scale_step
        real :: plotPVG_xmin,plotPVG_xmax
        integer :: plotPVG_grid
+       logical :: save_external_file
+       logical :: load_external_file
+       logical :: save_after_sim
+       real :: fac
 end module initCond
 
 module parametersBackground

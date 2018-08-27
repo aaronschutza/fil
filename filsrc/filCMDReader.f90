@@ -123,6 +123,21 @@ case('b_write_boundary=','write_boundary=')
 call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
 read(name(istr+1:str_len_max),*) write_boundary
 exit
+!**logical**
+case('b_load_external_file=','load_external_file=')
+call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
+read(name(istr+1:str_len_max),*) load_external_file
+exit
+!**logical**
+case('b_save_external_file=','save_external_file=')
+call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
+read(name(istr+1:str_len_max),*) save_external_file
+exit
+!**logical**
+case('b_save_after_sim=','save_after_sim=')
+call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
+read(name(istr+1:str_len_max),*) save_after_sim
+exit
 !**integer**
 case('i_method=','method=')
 read(name(istr+1:str_len_max),*) method
@@ -374,6 +389,14 @@ exit
 !**real**
 case('f_sigmaP=','sigmaP=')
 read(name(istr+1:str_len_max),*) sigmaP
+exit
+!**integer**
+case('i_iopen=','iopen=')
+read(name(istr+1:str_len_max),*) iopen
+exit
+!**real**
+case('f_fac=','fac=')
+read(name(istr+1:str_len_max),*) fac
 exit
 !**logical**
 case('b_do_sweep=','do_sweep=')
