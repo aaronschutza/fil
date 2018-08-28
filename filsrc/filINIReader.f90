@@ -145,6 +145,10 @@ subroutine readini(name,iflag)
 	if(ifound==1 .or. iflag==1)  call intStrToLStr(iniStr,iniStr)
 	if(ifound==1 .or. iflag==1)  read(iniStr,*) save_after_sim
 
+	!**string**
+	call getValue(ifound,iflag,'data','s_external_file',iniStr,'ext')
+	if(ifound==1 .or. iflag==1)  external_file= trim(adjustl(iniStr))
+
 	!********** section main *************
 
 	!**integer**

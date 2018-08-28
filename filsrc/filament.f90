@@ -167,7 +167,6 @@ if(narg>0)then
 	end do
 end if
 
-
 !**********************************************
 if (do_sweep) then
 	n_pnt = sw_points
@@ -183,9 +182,6 @@ else
 	n_pnt = 1
 endif
 !**********************************************
-
-
-
 
 if (mod(dimj,2)<1) then
 	dimj = dimj+1
@@ -282,12 +278,47 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 	recallPos = -1
 	time = 0.0
 	n = 0
-	if (cnfIn == 1) then
-		call initialConditions1
+	if (load_external_file) then
+		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext', status="old")
+		read(111,*) i
+		if(dimi /= i) stop 'Error: dimi/=i'
+		read(111,*) i
+		if(dimj /= i) stop 'Error: dimj/=j'
+		read(111,*) time
+		read(111,*) n
+		do i = 1,dimj
+			read(111,*) state(:,i)
+		end do
+		if (dimjp /= 0) then
+			do i = 1,dimjp
+				read(111,*) statePlas(:,i)
+			end do
+		end if
+		close(111)
 	else
-		write(6,*) 'Error: invalid cnfIn'
-		stop
+		call initialConditions1
 	end if
+
+	if (save_external_file .and. .not. save_after_sim) then
+		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext', status="replace")
+		close(111)
+		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext',position="append", status="old")
+		write(111,*) dimi
+		write(111,*) dimj + dimjp
+		write(111,*) time
+		write(111,*) n
+		do i = 1,dimj
+			write(111,*) state(:,i)
+		end do
+		if (dimjp /= 0) then
+			do i = 1,dimjp
+				write(111,*) statePlas(:,i)
+			end do
+		end if
+		close(111)
+		write(*,*) trim(datapath)//'.ext file saved'
+	endif
+  if(dontRunSim) stop 
 	!**********************************************
 	if (write_binary_data) then
 		open(unit=111, file=trim(datapath)//".bin",form="unformatted", status="replace",access="stream")
@@ -301,25 +332,6 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 		write(111) state
 		if (dimjp /= 0) then
 			write(111) statePlas
-		end if
-		close(111)
-	endif
-
-	if(write_full_filament) then
-		open(unit=111, file=trim(datapath), status="replace")
-		close(111)
-		open(unit=111, file=trim(datapath),position="append", status="old")
-		write(111,*) dimi
-		write(111,*) dimj + dimjp
-		write(111,*) time
-		write(111,*) n
-		do i = 1,dimj
-			write(111,*) state(:,i)
-		end do
-		if (dimjp /= 0) then
-			do i = 1,dimjp
-				write(111,*) statePlas(:,i)
-			end do
 		end if
 		close(111)
 	endif
@@ -552,6 +564,27 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 		!$OMP end master
 		!$OMP barrier	 
 	enddo
+
+	!$OMP master
+	if (save_external_file .and. save_after_sim) then
+		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext', status="replace")
+		close(111)
+		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext',position="append", status="old")
+		write(111,*) dimi
+		write(111,*) dimj + dimjp
+		write(111,*) time
+		write(111,*) n
+		do i = 1,dimj
+			write(111,*) state(:,i)
+		end do
+		if (dimjp /= 0) then
+			do i = 1,dimjp
+				write(111,*) statePlas(:,i)
+			end do
+		end if
+		close(111)
+	endif
+	!$OMP end master
 enddo!*********end thr_val sequence ****
 !$OMP end parallel
 run = 0
@@ -559,6 +592,5 @@ call cpu_time(cpuT2)
 write(*,*) 'Elapsed CPU time =',cpuT2-cpuT1
 !$ seconds = omp_get_wtime() - seconds
 !$ write(*,*) 'Wallclock time =',seconds
-
 
 end program

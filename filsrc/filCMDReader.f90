@@ -138,6 +138,10 @@ case('b_save_after_sim=','save_after_sim=')
 call intStrToLStr(name(istr+1:str_len_max),name(istr+1:str_len_max))
 read(name(istr+1:str_len_max),*) save_after_sim
 exit
+!**string**
+case('s_external_file=','external_file=')
+external_file = name(istr+1:str_len_max)
+exit
 !**integer**
 case('i_method=','method=')
 read(name(istr+1:str_len_max),*) method

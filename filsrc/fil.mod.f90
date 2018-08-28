@@ -126,7 +126,7 @@ end module variables1
 
 module dnams
        character(len=100) :: fileName,fileDir,datapath,tecPlotDir,tecPlotFileName,am03Model,am03ModelDir, &
-       & tsyModelDir,tsyModel,fricDir
+       & tsyModelDir,tsyModel,fricDir,external_file
     real :: am03ModelTime
     integer :: upscalingFactor
 end module dnams

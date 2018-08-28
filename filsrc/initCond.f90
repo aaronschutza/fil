@@ -20,6 +20,7 @@ subroutine initialConditions1
   use errorMod
   use dnams
   use variables1, only: rebuild_background,write_full_filament
+  use boundmod
   implicit none
   real :: pBack,Bx,Bz
   real :: l,ptotal,ptot
@@ -1170,10 +1171,7 @@ subroutine initialConditions1
 
   !write(*,*) alpha,A0,ht
 
-
   call filEigen
-
-  if(dontRunSim) stop
 
 end subroutine initialConditions1
 
