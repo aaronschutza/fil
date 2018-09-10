@@ -279,6 +279,7 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 	time = 0.0
 	n = 0
 	if (load_external_file) then
+		call initialConditions1
 		open(unit=111, file=trim(fileDir)//'/'//trim(external_file)//'.ext', status="old")
 		read(111,*) i
 		if(dimi /= i) stop 'Error: dimi/=i'
@@ -316,7 +317,6 @@ do i_thr = 1,n_pnt !*********begin sweep sequence ****
 			end do
 		end if
 		close(111)
-		write(*,*) trim(datapath)//'.ext file saved'
 	endif
   if(dontRunSim) stop 
 	!**********************************************
